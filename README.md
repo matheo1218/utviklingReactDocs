@@ -94,7 +94,7 @@ With the use of intefaces, you can define a static type that branches, and use t
 
     function ProvideCarInfo(car: Car) {
         console.log(`This is a ${car.model}`);
-        console.log(`The car was relesed in ${car.releaseDate}`);
+        console.log(`The car was released in ${car.releaseDate}`);
         if(car.color) {
             console.log(`The car is ${car.model}`);
         }
@@ -108,11 +108,11 @@ The code above would log the following in the console:
 
 ```
 This is a Tesla Model X
-The car was relesed in 2001
+The car was released in 2001
 This car is not bought second hand
 
 This is a Car
-The car was relesed in 2024
+The car was released in 2024
 The car is Car
 This car is bought second hand
 ```
@@ -122,9 +122,11 @@ This car is bought second hand
 React hooks are functions that can "hook" into states and such in React <br>
 [For a more detailed explanation of hooks](https://www.w3schools.com/react/react_hooks.asp)<br>
 Simply speaking, they are an easy way to use the state and rendering-system that makes React so good<br>
+Each time there is a state-change, there is also a rerender<br>
 This documentation will show the two most important hooks to learn at the start, what they do, and why to use them<br>
 
 ### UseState
+A useState is a variable saved in a state, which works excellent when building responsive websites that should be able to scale
 ```tsx
     const [name, setName] = useState<string>("");
 ```
@@ -137,5 +139,86 @@ The other value `setName` is the functions that allow you to change the value of
     // Instead define it the correct way:
     setName("Henrik");
 ```
+After the `useState` you define the type of the state, inside `<>`
+The above useState will only accept the type `string``
+Lastly, inside the `()` you define the states initial value
+```tsx
+    // This will not work
+    const [name, setName] = useState<string>(25);
+
+    // This, however, will
+    const [name, setName] = useState<string[]>(["Karl", "Fredrik"]);
+
+    // You can also define a useState with an interface
+    interface Car {
+        model: string;
+        releaseDate: number;
+        color?: string;
+        isBoughtSecondHand: boolean;
+    }
+
+    const [car, setCar] = useState<Car>({
+        model: "Tesla Model X",
+        releaseDate: 2001,
+        isBoughtSecondHand: true
+    });
+```
+Underneath is an example of how you can use a useState
+```tsx
+    export default function DisplayScore() {
+        const [score, setScore] = useState(0);
+        return (
+            <div>
+                <p>{score}</p>
+                <button onClick={() => setScore(score+1)}>+</button>
+                <button onClick={() => setScore(score-1)}>-</button>
+            </div>
+        );
+    }
+```
+
 ### UseEffect
+A useEffect is a function that gets called each re-render
+These are used when you want something to happen, or something to change, on a render
+```tsx
+    useEffect(() => {
+        // This is the default setup of a useEffect
+        // The code inside the {} will be executed on each re-render
+        // That means that the console.log below would be called each time you clicked the button from the example above
+        console.log("Re-render triggered");
+    });
+```
+
+However, you can also limit what kind of re-renders you want to trigger the `useEffect` <br>
+`useEffect`s allow a second parameter, after the function that gets called <br>
+This parameter is an array containing dependensies, defining which type of re-renders will trigger the code
+```tsx
+    export default function DisplayScore() {
+        const [score, setScore] = useState(0);
+
+        useEffect(() => {
+            // This useEffect will trigger each time the state "score" re-renders
+            // This includes when it is defined
+            // If i were to click the "+" button 3 times, the console would say: 
+            // 0, 1, 2, 3
+            console.log(score);
+        },[score]);
+
+        return (
+            <div>
+                <p>{score}</p>
+                <button onClick={() => setScore(score+1)}>+</button>
+                <button onClick={() => setScore(score-1)}>-</button>
+            </div>
+        );
+    }
+```
+You can also define that you only want the useEffect to be called at the first render, by adding an empty depenency-array
+```tsx
+    useEffect(() => {
+
+    },[]);
+```
+If you add multiple dependencies, the function will be called each time either of them causes a re-render
+
 ### Using React hooks together
