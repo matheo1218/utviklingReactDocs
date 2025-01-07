@@ -3,6 +3,7 @@
 - [Introduction](#introduction)
 - [Static types](#static-types)
 - [React Hooks](#react-hooks)
+- [Usefull Functions](#usefull-functions)
 
 ## Introduction
 React is a framework that is based on JavaScript, or TypeScript in our case
@@ -140,7 +141,7 @@ The other value `setName` is the functions that allow you to change the value of
     setName("Henrik");
 ```
 After the `useState` you define the type of the state, inside `<>`
-The above useState will only accept the type `string``
+The above useState will only accept the type `string`
 Lastly, inside the `()` you define the states initial value
 ```tsx
     // This will not work
@@ -222,3 +223,35 @@ You can also define that you only want the useEffect to be called at the first r
 If you add multiple dependencies, the function will be called each time either of them causes a re-render
 
 ### Using React hooks together
+As you saw in one of the examples above that you can use `useState`s to trigger the functions of the `useEffect`
+Underneath is another example of how you can use both
+```tsx 
+    export default function DisplayScore() {
+        const [score, setScore] = useState(0);
+        const [threeScore, setThreeScore] = useState(0);
+    
+        useEffect(() => {
+            // This useEffect will trigger each time the state "score" re-renders
+            // It then sets the state of threeScore to three times the newest state of score
+            setThreeScore(score * 3);
+        },[score]);
+
+        useEffect(() => {
+            // This useEffect will trigger each time the state "threeScore" re-renders
+            // If i were to click the "+" button 3 times, the console would say: 
+            // 0, 3, 6, 9
+            console.log(threeScore);
+        },[threeScore]);
+
+        return (
+            <div>
+                <p>{score}</p>
+                <button onClick={() => setScore(score+1)}>+</button>
+                <button onClick={() => setScore(score-1)}>-</button>
+            </div>
+        );
+    }
+```
+
+
+## Usefull Functions
