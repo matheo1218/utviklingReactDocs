@@ -255,3 +255,211 @@ Underneath is another example of how you can use both
 
 
 ## Usefull Functions
+In this part, we'll show some of the most usefull functions in React, and how they can be used
+- [Fetch](#fetch)
+
+### Fetch
+#### Introduction
+The fetch command is the best way to fetch data from an API `Objectively, Axios is bad :(`
+It's a simple function, that takes a few parameters, and makes it possible to communicate with other services
+[For more documentation, look here](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
+
+#### Fetch as a promise
+The fetch function returns a promise. This means that you will not get returned a string, but rather a promise that it is trying to fetch a string
+There is two popular ways to make the function return data instead of a promise, and this docs will  focus on my favorite
+```tsx
+    async function fetchData() {
+        fetch("examplesite.com/api/test-api");
+        // This will return a promise
+
+        await fetch("examplesite.com/api/test-api");
+        // This will fetch the data that gets returned by the request
+    }
+
+    fetchData();
+```
+By `await`ing the fetch function inside an `async` function, the code will return the correct data
+You can look at `async` as a command that the code should wait for code to finish if its told so, and `await` as a marker that tells you to wait
+If you wait for a promise to finish, it will return the data it promised
+As a rule of thumb, you should always `await` a fetch function
+
+#### The parameters of fetch
+##### URL
+The first parameter is the URL. That is the service youre trying to reach with the fetch function
+```tsx
+    async function fetchData() {
+        const url: string = "examplesite.com/api/test-api"
+        fetch(url);
+    }
+
+    fetchData();
+```
+##### Method
+Technically, there is only two parameters, where the seconds paramameter is an object filled with data, but we'll count that as multiple
+Fetch often follows the consept `CRUD` (Create, read, update, delete)
+With fetch, this is divied into four methods: `POST, GET, PUT, DELETE`
+The method is defined inside an object
+
+```tsx
+    async function fetchData() {
+        const url: string = "examplesite.com/api/test-api";
+        const METHOD: string = "GET";
+        const secondParameterObject = {
+            method: METHOD
+        }
+        fetch(url, secondParameterObject);
+    }
+
+    fetchData();
+```
+The method is defined as a string inside the second parameter object
+
+##### Headers
+The second parameter of the object is the headers parameter
+The header contains data of how the api should process the request
+It can include things such as which format the request is, and its authorization
+Different kind of requests will nead different headers
+```tsx
+    async function fetchData() {
+        const url: string = "examplesite.com/api/test-api";
+        const METHOD: string = "POST";
+        const HEADERS = {
+            "Content-Type":"application/json", // This is the most used header, and is telling the api that the request will contain json
+            "Authorization":"Bearer lja56iojgoi54eo9i4j4e09gjej4g"
+        }
+        const secondParameterObject = {
+            method: METHOD,
+            headers: HEADERS,
+        }
+        fetch(url, secondParameterObject);
+    }
+
+    fetchData();
+```
+
+###### Body
+The third and final parameter of the object is the body.
+Only `POST`, `PUT`, and `DELETE` allow the use of `BODY`
+A body must contain the kind of data defined in the headers
+
+```tsx
+    async function fetchData() {
+        const url: string = "examplesite.com/api/test-api";
+
+        const METHOD: string = "POST";
+
+        const HEADERS = {
+            "Content-Type":"application/json",
+            "Authorization":"Bearer lja56iojgoi54eo9i4j4e09gjej4g"
+        }
+
+        const BODY = {
+            arms: 2,
+            name: "Henrik"
+        }
+
+        const jsonBODY = json.stringify(BODY); // You have to make sure the data that is sent in is the same as the headers, in this case json
+
+        const secondParameterObject = {
+            method: METHOD,
+            headers: HEADERS,
+            body: jsonBODY,
+        }
+        fetch(url, secondParameterObject);
+    }
+
+    fetchData();
+```
+
+### Map
+#### Introduction
+The `map` function is one of the most usefull functions when creating a responsive and scaleable application
+It allows you to display data from an array in the `HTML` part of TSX  
+Functionally it works the same as a `forEach`-loop, but can be used inside the `HTML`, making it better for this usecase
+
+#### Examples
+The `map` function must be used inside `{}`
+The examle underneath will show how you can use the map function to display easy data from an array
+```tsx
+    export default function MapDisplayer() {
+        const arrayOfData: string[] = ["Hello", "World"];
+        return (
+            <div>
+                {arrayOfData&&arrayOfData.map((data, index) => ( // Data = The index of the array youre currently on, index = the index
+                    <p key={index}>{data}</p> // This would display both Hello and World. To differentiate the p tags from eachother, you give them the key value, thats set to the index
+                ))}
+            </div>
+        );
+    }
+```
+If you wonder why it was written `arrayOfData&&arrayOfData.map`, that simply checks if arrayOfData exists before displaying<br>
+This example will show how you can use the `map` function with an object
+```tsx
+    export default function MapDisplayer() {
+        interface PersonInterface {
+            name: string;
+            age: number;
+            favoriteFood: string;
+        }
+
+        const arrayOfData: PersonInterface[] = [{
+            name: "Henrik",
+            age: 18,
+            favoriteFood: "Slicers"
+        } , {
+            name: "Mathias",
+            age: 29,
+            favoriteFood: "Hot dogs"
+        }];
+
+        return (
+            <div>
+                {arrayOfData&&arrayOfData.map((person, index) => (
+                    <p key={index}>{person.name} is {person.age} years old, and likes eating {person.favoriteFood}</p> 
+                ))}
+            </div>
+        );
+    }
+```
+As you can see, you can use the properties of the object to display even more information
+
+## The previous chapters mixed
+### Introduction
+Now, we'll try to mix all of the different things we've looked at in this documentation
+### Example
+```tsx
+    interface PersonInterface { // Defining an interface
+        firstname: string;
+        lastname: string;
+        age: number;
+        id: number;
+        adress: string;
+    }
+
+    export default function ExampleFunction() {
+        const [personArray, setPersonArray] = useState<PersonInterface[]>([]); // Creating a useState personArray that is an array of persons
+
+        async function FetchData() {
+            const response = await fetch("https://testapi.com/api/fetch-person-data"); // Fetching data
+            const data = await response.json();
+            setPersonArray(data); // And setting that data as the value of the useState
+        }
+
+        useEffect(() => {
+            FetchData(); //Fetching the data the first time the site loads
+        },[])
+
+        return (
+            <div>
+                {personArray && personArray.length && personArray.map((person, index) => ( // If the useState exists, and its length is more than 0, then you should map it
+                    <div key={index}>
+                        <p>{person.firstname} {person.lastname}</p>
+                        <p>{person.age}</p>
+                        <p>{person.id}</p>
+                        <p>{person.adress}</p>
+                    </div>
+                ))}
+            </div>
+        );
+    }
+```
